@@ -1,5 +1,7 @@
 # Finance Tracker 💸
 
+🌐 **Live Demo:** https://finance-tracker-app-iw4x.onrender.com
+
 A full-stack **personal finance tracker** that helps users manage income and expenses, visualize spending habits, and receive **AI-powered financial insights and savings suggestions**.
 
 This project demonstrates real-world full-stack development with modern technologies, authentication, data visualization, and AI integration.
@@ -9,26 +11,31 @@ This project demonstrates real-world full-stack development with modern technolo
 ## 🚀 Live Features
 
 ### 🔐 Authentication
+
 - Secure user signup & login
 - JWT-based authentication
 - Protected routes for user data
 
 ### 💰 Transactions
+
 - Add income and expenses
 - Edit and delete transactions
 - Data scoped per user
 
 ### 📊 Financial Overview
+
 - Total income, expenses, and balance
 - Category breakdown (charts)
 - Income vs expense visualization
 
 ### 🤖 AI Insights
+
 - AI-generated spending analysis
 - Identifies trends and warnings
 - Personalized financial suggestions based on user data
 
 ### 💡 AI Savings Suggestions
+
 - Smart recommendations to improve savings
 - Generated dynamically from transaction history
 
@@ -37,18 +44,21 @@ This project demonstrates real-world full-stack development with modern technolo
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - React
 - Vite
 - Tailwind CSS
 - Recharts (data visualization)
 
 ### Backend
+
 - Node.js
 - Express
 - MongoDB + Mongoose
 - JWT Authentication
 
 ### AI
+
 - OpenAI API (GPT model)
 - Prompt-driven financial analysis
 
@@ -73,9 +83,17 @@ This project demonstrates real-world full-stack development with modern technolo
 
 ---
 
+## 🚀 Deployment
+
+- Frontend deployed with Render
+- Backend deployed with Render
+- MongoDB hosted on MongoDB Atlas
+- CI/CD via GitHub → Render auto-deploy
+
+---
+
 ## 📈 Future Improvements
 
-- Deployment (frontend + backend)
 - Monthly budgets
 - Recurring transactions
 - Export reports (CSV / PDF)
