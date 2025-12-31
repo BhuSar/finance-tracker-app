@@ -1,4 +1,9 @@
-const API_BASE = "http://localhost:5000";
+const API_BASE =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5000"
+    : "https://finance-tracker-app-w4x.onrender.com";
+
+export default API_BASE;
 
 function getToken() {
   return localStorage.getItem("authToken") || localStorage.getItem("token");
