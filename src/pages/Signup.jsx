@@ -40,7 +40,10 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-950 px-4">
       <div className="w-full max-w-md bg-white dark:bg-gray-900 border rounded-xl p-6">
-        <h2 className="text-xl font-bold mb-1">Create Account</h2>
+        <h2 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">
+          Create Account
+        </h2>
+
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
           Sign up for Finance Tracker
         </p>
@@ -53,7 +56,11 @@ export default function Signup() {
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
-            className="w-full px-3 py-2 border rounded-md"
+            type="email"
+            className="w-full px-3 py-2 border rounded-md
+                       bg-white text-black
+                       dark:bg-gray-800 dark:text-white
+                       placeholder-gray-400 dark:placeholder-gray-400"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -61,20 +68,23 @@ export default function Signup() {
 
           <input
             type="password"
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border rounded-md
+                       bg-white text-black
+                       dark:bg-gray-800 dark:text-white
+                       placeholder-gray-400 dark:placeholder-gray-400"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <button className="w-full bg-blue-600 text-white py-2 rounded-md">
+          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md">
             Sign Up
           </button>
         </form>
 
-        <p className="text-sm text-center mt-4">
+        <p className="text-sm text-center mt-4 text-gray-700 dark:text-gray-300">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600">
+          <Link to="/login" className="text-blue-600 hover:underline">
             Log In
           </Link>
         </p>
