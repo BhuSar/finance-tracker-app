@@ -3,7 +3,7 @@
 const API_BASE =
   import.meta.env.MODE === "development"
     ? "http://localhost:5000"
-    : "https://finance-tracker-app-iw4x.onrender.com";
+    : "https://finance-tracker-app-iw4x.onrender.com"; // ✅ correct Render backend URL (has the "i")
 
 export default API_BASE;
 
@@ -42,19 +42,13 @@ async function request(path, options = {}) {
 export const getTransactions = () => request("/api/transactions");
 
 export const addTransaction = (payload) =>
-  request("/api/transactions", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  request("/api/transactions", { method: "POST", body: JSON.stringify(payload) });
 
 export const deleteTransaction = (id) =>
   request(`/api/transactions/${id}`, { method: "DELETE" });
 
 export const updateTransaction = (id, payload) =>
-  request(`/api/transactions/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(payload),
-  });
+  request(`/api/transactions/${id}`, { method: "PUT", body: JSON.stringify(payload) });
 
 export const getSummary = () => request("/api/transactions/summary");
 
