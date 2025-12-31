@@ -1,50 +1,17 @@
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Recreate __dirname for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// ✅ Always load .env from /server
-dotenv.config({ path: path.join(__dirname, ".env") });
-
-// =======================
-// IMPORTS
-// =======================
 import express from "express";
-import cors from "cors";
 import mongoose from "mongoose";
-import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
 
-// ROUTES
 import authRoutes from "./routes/authRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
-import aiInsightsRoutes from "./routes/aiInsightsRoutes.js";
-import aiSavingsRoutes from "./routes/aiSavingsRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
-// =======================
-// CREATE APP
-// =======================
+dotenv.config();
+
 const app = express();
 
-// =======================
-// DEBUG ENV (KEEP THIS)
-// =======================
-console.log("========== ENV CHECK ==========");
-console.log("CWD:", process.cwd());
-console.log("PORT:", process.env.PORT);
-console.log("MONGO_URI:", process.env.MONGO_URI ? "Loaded" : "❌ Missing");
-console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Loaded" : "❌ Missing");
-console.log(
-  "OPENAI_API_KEY:",
-  process.env.OPENAI_API_KEY ? "Loaded" : "❌ Missing"
-);
-console.log("================================");
-
-// =======================
-// MIDDLEWARE
-// =======================
+app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -52,41 +19,26 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(cookieParser());
+app.get("/api/ping", (req, res) => res.json({ message: "pong" }));
 
-// =======================
-// BASE ROUTES
-// =======================
-app.get("/", (req, res) => {
-  res.send("API running...");
-});
-
-app.get("/api/ping", (req, res) => {
-  res.json({ message: "pong" });
-});
-
-// =======================
-// API ROUTES
-// =======================
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
-app.use("/api/ai", aiInsightsRoutes);
-app.use("/api/ai", aiSavingsRoutes);
+app.use("/api/ai", aiRoutes);
 
-// =======================
-// DATABASE CONNECT
-// =======================
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB error:", err));
+// ✅ PROOF these endpoints exist:
+app.get("/api/ai-test", (req, res) => res.json({ ok: true, msg: "ai routes mounted" }));
 
-// =======================
-// START SERVER
-// =======================
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+async function start() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB connected");
+    console.log("✅ RUNNING server/server.js with AI routes mounted"); // <— LOOK FOR THIS
+    app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+  } catch (err) {
+    console.error("❌ Server error:", err.message);
+  }
+}
+
+start();

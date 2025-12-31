@@ -62,7 +62,7 @@ export default function TransactionForm({ onAdd }) {
       setConfidence(finalConfidence);
 
       // Auto-fill if High
-      if (finalConfidence.toLowerCase() === "high") {
+      if (String(finalConfidence).toLowerCase() === "high") {
         setCategory(finalCategory);
       }
     } catch (err) {
@@ -81,6 +81,7 @@ export default function TransactionForm({ onAdd }) {
       predictCategory(name, amount);
     }, 500);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name]);
 
   // SUBMIT HANDLER
@@ -119,19 +120,31 @@ export default function TransactionForm({ onAdd }) {
       ? "bg-yellow-500 text-black"
       : "bg-red-600";
 
+  // ✅ One consistent input style (fixes “strange text”)
+  const inputClass =
+    "w-full p-2 rounded-md border " +
+    "border-gray-300 bg-white text-gray-900 " +
+    "placeholder:text-gray-500 " +
+    "focus:outline-none focus:ring-2 focus:ring-blue-500/30 " +
+    "dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 " +
+    "dark:placeholder:text-gray-400";
+
   return (
     <motion.form
       onSubmit={submit}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#111827] dark:bg-white p-4 rounded-xl shadow-lg space-y-4"
+      className="
+        p-4 rounded-xl shadow-lg space-y-4 border
+        bg-white border-gray-200 text-gray-900
+        dark:bg-gray-900 dark:border-gray-800 dark:text-gray-100
+      "
     >
       <h2 className="text-lg font-semibold mb-2">Add Transaction</h2>
 
       {/* Name */}
       <input
-        className="w-full p-2 rounded bg-gray-800 dark:bg-gray-200 
-                   text-white dark:text-black"
+        className={inputClass}
         placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -140,8 +153,7 @@ export default function TransactionForm({ onAdd }) {
       {/* Amount */}
       <input
         type="number"
-        className="w-full p-2 rounded bg-gray-800 dark:bg-gray-200 
-                   text-white dark:text-black"
+        className={inputClass}
         placeholder="Amount (positive = income, negative = expense)"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
@@ -149,8 +161,7 @@ export default function TransactionForm({ onAdd }) {
 
       {/* Category */}
       <input
-        className="w-full p-2 rounded bg-gray-800 dark:bg-gray-200 
-                   text-white dark:text-black"
+        className={inputClass}
         placeholder="Category"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
@@ -160,22 +171,24 @@ export default function TransactionForm({ onAdd }) {
       {name && aiCategory && (
         <>
           {/* Suggestion Row */}
-          <div className="flex items-center justify-between mt-1 px-2 py-1
-                          bg-gray-800 dark:bg-gray-100 rounded-lg text-xs">
-
-            <p className="text-gray-300 dark:text-gray-700">
+          <div
+            className="
+              flex items-center justify-between mt-1 px-2 py-1 rounded-lg text-xs
+              bg-gray-100 text-gray-700
+              dark:bg-gray-950 dark:text-gray-200
+              border border-gray-200 dark:border-gray-800
+            "
+          >
+            <p className="text-gray-700 dark:text-gray-200">
               <span className="font-semibold">AI Suggestion:</span>{" "}
-              {loadingPrediction
-                ? "Predicting..."
-                : `${getEmoji(aiCategory)} ${aiCategory}`}
+              {loadingPrediction ? "Predicting..." : `${getEmoji(aiCategory)} ${aiCategory}`}
             </p>
 
             {!loadingPrediction && level !== "high" && (
               <button
                 type="button"
                 onClick={() => setCategory(aiCategory)}
-                className="text-[10px] px-2 py-1 bg-blue-600 hover:bg-blue-700 
-                            text-white rounded"
+                className="text-[10px] px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
               >
                 Use
               </button>
@@ -184,27 +197,30 @@ export default function TransactionForm({ onAdd }) {
 
           {/* Confidence Badge + Tooltip */}
           <div className="flex items-center gap-2">
-            <div
-              className={`inline-block px-3 py-1 mt-1 text-[10px] rounded-full ${badgeColor}`}
-            >
+            <div className={`inline-block px-3 py-1 mt-1 text-[10px] rounded-full ${badgeColor}`}>
               Confidence: {confidence}
             </div>
 
             {/* Tooltip */}
             <div className="relative group">
-              <span className="text-gray-400 dark:text-gray-600 text-xs cursor-pointer">
+              <span className="text-gray-500 dark:text-gray-400 text-xs cursor-pointer">
                 ℹ️
               </span>
 
-              <div className="absolute left-5 top-0 z-20 hidden group-hover:block 
-                              bg-black/80 dark:bg-white/90 text-white dark:text-black 
-                              text-[10px] px-2 py-1 rounded shadow-lg w-40">
+              <div
+                className="
+                  absolute left-5 top-0 z-20 hidden group-hover:block
+                  bg-black/80 text-white
+                  dark:bg-white/90 dark:text-black
+                  text-[10px] px-2 py-1 rounded shadow-lg w-40
+                "
+              >
                 <p className="leading-tight">
-                  <b>High</b> = Very confident  
+                  <b>High</b> = Very confident
                   <br />
-                  <b>Medium</b> = Unsure but likely  
+                  <b>Medium</b> = Unsure but likely
                   <br />
-                  <b>Low</b> = Weak guess  
+                  <b>Low</b> = Weak guess
                 </p>
               </div>
             </div>
@@ -214,9 +230,11 @@ export default function TransactionForm({ onAdd }) {
 
       {/* Submit Button */}
       <button
-        className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 
-                   text-white font-semibold transform 
-                   hover:scale-105 active:scale-95 transition"
+        className="
+          w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700
+          text-white font-semibold transform
+          hover:scale-105 active:scale-95 transition
+        "
       >
         Add Transaction
       </button>

@@ -5,12 +5,14 @@ import OpenAI from "openai";
 
 const router = express.Router();
 
+const getUserId = (req) => req.user?.id || req.user?._id || req.user;
+
 // =======================
 // AI INSIGHTS ROUTE
+// GET /api/ai/insights
 // =======================
 router.get("/insights", protect, async (req, res) => {
   try {
-    // ✅ Hard stop if key missing (clear error)
     if (!process.env.OPENAI_API_KEY) {
       return res.status(500).json({
         insights:
@@ -18,12 +20,11 @@ router.get("/insights", protect, async (req, res) => {
       });
     }
 
-    // ✅ Create client INSIDE handler (prevents ESM load-order issues)
-    const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const transactions = await Transaction.find({ user: req.user });
+    const userId = getUserId(req);
+
+    const transactions = await Transaction.find({ user: userId });
 
     if (!transactions.length) {
       return res.json({
@@ -35,9 +36,9 @@ router.get("/insights", protect, async (req, res) => {
     const formattedTransactions = transactions
       .map(
         (t) =>
-          `${t.amount > 0 ? "INCOME" : "EXPENSE"}: $${Math.abs(
-            t.amount
-          )} - ${t.category}`
+          `${t.amount > 0 ? "INCOME" : "EXPENSE"}: $${Math.abs(t.amount)} - ${
+            t.category
+          }`
       )
       .join("\n");
 
@@ -81,6 +82,37 @@ ${formattedTransactions}
     console.error("❌ AI Insights Error:", err);
     return res.status(500).json({
       insights: "AI service unavailable. Please try again later.",
+    });
+  }
+});
+
+// =======================
+// AI SAVINGS ROUTE (placeholder)
+// GET /api/ai/savings
+// =======================
+router.get("/savings", protect, async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const transactions = await Transaction.find({ user: userId });
+
+    if (!transactions.length) {
+      return res.json({
+        savings: "Add some transactions first, then refresh for suggestions.",
+      });
+    }
+
+    const expenses = transactions.filter((t) => t.amount < 0);
+    const totalSpent = expenses.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    return res.json({
+      savings: `You spent $${totalSpent.toFixed(
+        2
+      )} in expenses. Try setting a weekly cap for your biggest category and review subscriptions.`,
+    });
+  } catch (err) {
+    console.error("❌ AI Savings Error:", err);
+    return res.status(500).json({
+      savings: "Savings service unavailable. Please try again later.",
     });
   }
 });

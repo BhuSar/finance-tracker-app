@@ -1,67 +1,43 @@
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Pie } from "react-chartjs-2";
+import { useMemo } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+export default function CategoryBreakdownChart({ transactions = [] }) {
+  const data = useMemo(() => {
+    const map = {};
+    transactions.forEach((t) => {
+      const amt = Number(t.amount) || 0;
+      if (amt < 0) {
+        const cat = t.category || "Other";
+        map[cat] = (map[cat] || 0) + Math.abs(amt);
+      }
+    });
+    return Object.entries(map).map(([category, total]) => ({ category, total }));
+  }, [transactions]);
 
-export default function CategoryBreakdownChart({ data }) {
-  const transactions = Array.isArray(data) ? data : [];
-
-  const isDark = document.documentElement.classList.contains("dark");
-  const textColor = isDark ? "#FFFFFF" : "#1F2937";
-
-  if (!transactions.length) {
+  if (!data.length)
     return (
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-          Category Breakdown
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400">No data available.</p>
-      </div>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        No data available.
+      </p>
     );
-  }
-
-  const categories = {};
-  transactions.forEach((t) => {
-    categories[t.category] =
-      (categories[t.category] || 0) + Number(t.amount);
-  });
-
-  const labels = Object.keys(categories);
-  const values = Object.values(categories);
-
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        data: values,
-        backgroundColor: [
-          "#60A5FA",
-          "#34D399",
-          "#FBBF24",
-          "#F87171",
-          "#A78BFA",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    plugins: {
-      legend: {
-        labels: {
-          color: textColor,
-        },
-      },
-    },
-  };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-      <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-        Category Breakdown
-      </h2>
-      <Pie data={chartData} options={options} />
+    <div className="w-full h-56">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data}>
+          <XAxis dataKey="category" stroke="currentColor" />
+          <YAxis stroke="currentColor" />
+          <Tooltip />
+          <Bar dataKey="total" fill="#22c55e" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

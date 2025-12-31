@@ -1,115 +1,44 @@
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE = "http://localhost:5000";
 
-// =======================
-// HELPER: AUTH HEADER
-// =======================
-function authHeader() {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
+function getToken() {
+  return localStorage.getItem("authToken") || localStorage.getItem("token");
 }
 
-// =======================
-// AUTH
-// =======================
-export async function signup(email, password) {
-  const res = await fetch(`${API_URL}/auth/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  const data = await res.json();
-  if (data.token) localStorage.setItem("token", data.token);
+async function request(path, options = {}) {
+  const token = getToken();
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+
+  const contentType = res.headers.get("content-type") || "";
+  const isJson = contentType.includes("application/json");
+  const data = isJson ? await res.json().catch(() => null) : await res.text().catch(() => "");
+
+  if (!res.ok) {
+    const msg = (data && data.message) || (typeof data === "string" ? data : "") || `Error ${res.status}`;
+    throw new Error(msg);
+  }
+
   return data;
 }
 
-export async function login(email, password) {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  const data = await res.json();
-  if (data.token) localStorage.setItem("token", data.token);
-  return data;
-}
+export const getTransactions = () => request("/api/transactions");
 
-export function logout() {
-  localStorage.removeItem("token");
-}
+export const addTransaction = (payload) =>
+  request("/api/transactions", { method: "POST", body: JSON.stringify(payload) });
 
-// =======================
-// TRANSACTIONS
-// =======================
-export async function getTransactions() {
-  const res = await fetch(`${API_URL}/transactions`, {
-    headers: {
-      ...authHeader(),
-    },
-  });
-  return res.json();
-}
+export const deleteTransaction = (id) =>
+  request(`/api/transactions/${id}`, { method: "DELETE" });
 
-export async function addTransaction(data) {
-  const res = await fetch(`${API_URL}/transactions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeader(),
-    },
-    body: JSON.stringify(data),
-  });
-  return res.json();
-}
+export const updateTransaction = (id, payload) =>
+  request(`/api/transactions/${id}`, { method: "PUT", body: JSON.stringify(payload) });
 
-export async function updateTransaction(id, data) {
-  const res = await fetch(`${API_URL}/transactions/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeader(),
-    },
-    body: JSON.stringify(data),
-  });
-  return res.json();
-}
+export const getSummary = () => request("/api/transactions/summary");
 
-export async function deleteTransaction(id) {
-  const res = await fetch(`${API_URL}/transactions/${id}`, {
-    method: "DELETE",
-    headers: {
-      ...authHeader(),
-    },
-  });
-  return res.json();
-}
-
-export async function getSummary() {
-  const res = await fetch(`${API_URL}/transactions/summary`, {
-    headers: {
-      ...authHeader(),
-    },
-  });
-  return res.json();
-}
-
-// =======================
-// AI
-// =======================
-export async function getAIInsights() {
-  const res = await fetch(`${API_URL}/ai/insights`, {
-    headers: {
-      ...authHeader(),
-    },
-  });
-  return res.json();
-}
-
-export async function getAISavings() {
-  const res = await fetch(`${API_URL}/ai/savings`, {
-    headers: {
-      ...authHeader(),
-    },
-  });
-  return res.json();
-}
+export const getAIInsights = () => request("/api/ai/insights");
+export const getAISavings = () => request("/api/ai/savings");

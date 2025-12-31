@@ -1,42 +1,51 @@
 import { useEffect, useState } from "react";
-import logo from "../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
+
+  const logout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/login");
+  };
 
   return (
-    <nav className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white px-6 py-3 shadow flex justify-between items-center transition-colors duration-300">
-      
-      {/* Logo */}
-      <div className="flex items-center gap-2">
-        <img src={logo} alt="logo" className="w-8 h-8" />
-        <span className="font-semibold text-lg">Finance Tracker</span>
+    <nav className="flex items-center justify-between px-6 py-3
+                    bg-white border-b border-gray-200
+                    dark:bg-gray-900 dark:border-gray-800">
+      <div className="flex items-center gap-2 text-lg font-semibold
+                      text-gray-900 dark:text-gray-100">
+        <span className="w-3 h-3 rounded bg-blue-600 inline-block" />
+        Finance Tracker
       </div>
 
-      {/* Controls */}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="px-3 py-1 rounded bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white transition"
+          onClick={() => setDarkMode(!darkMode)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md
+                     bg-gray-200 text-gray-900 hover:bg-gray-300
+                     dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700
+                     transition"
         >
-          {theme === "dark" ? "Light Mode 🌞" : "Dark Mode 🌙"}
+          {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
         </button>
 
         <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            navigate("/login");
-          }}
-          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+          onClick={logout}
+          className="px-3 py-1.5 rounded-md bg-red-600 text-white hover:bg-red-700"
         >
           Logout
         </button>

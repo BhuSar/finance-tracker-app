@@ -1,85 +1,54 @@
+import { useMemo } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
   Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+export default function IncomeVsExpenseChart({ transactions = [] }) {
+  const data = useMemo(() => {
+    let income = 0;
+    let expense = 0;
 
-export default function IncomeVsExpenseChart({ data }) {
-  const transactions = Array.isArray(data) ? data : [];
+    transactions.forEach((t) => {
+      const amt = Number(t.amount) || 0;
+      if (amt >= 0) income += amt;
+      else expense += Math.abs(amt);
+    });
 
-  const isDark = document.documentElement.classList.contains("dark");
-  const textColor = isDark ? "#FFFFFF" : "#1F2937";
+    if (income === 0 && expense === 0) return [];
 
-  if (!transactions.length) {
+    return [
+      { name: "Income", value: income, fill: "#22c55e" },
+      { name: "Expense", value: expense, fill: "#ef4444" },
+    ];
+  }, [transactions]);
+
+  if (!data.length)
     return (
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-          Income vs Expense
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400">No data available.</p>
-      </div>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        No data available.
+      </p>
     );
-  }
-
-  let income = 0;
-  let expenses = 0;
-
-  transactions.forEach((t) => {
-    if (t.amount >= 0) income += Number(t.amount);
-    else expenses += Math.abs(Number(t.amount));
-  });
-
-  const hasData = income > 0 || expenses > 0;
-
-  const chartData = {
-    labels: hasData ? ["Income", "Expenses"] : ["No Data"],
-    datasets: [
-      {
-        label: "Amount",
-        data: hasData ? [income, expenses] : [1],
-        backgroundColor: hasData
-          ? ["#34D399", "#EF4444"]
-          : ["#9CA3AF"],
-        borderColor: hasData
-          ? ["#059669", "#DC2626"]
-          : ["#6B7280"],
-        borderWidth: 1.5,
-      },
-    ],
-  };
-
-  const options = {
-    plugins: {
-      legend: {
-        labels: {
-          color: textColor,
-        },
-      },
-    },
-    scales: {
-      x: {
-        ticks: { color: textColor },
-        grid: { color: isDark ? "#374151" : "#E5E7EB" },
-      },
-      y: {
-        ticks: { color: textColor },
-        grid: { color: isDark ? "#374151" : "#E5E7EB" },
-      },
-    },
-  };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-      <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-        Income vs Expense
-      </h2>
-      <Bar data={chartData} options={options} />
+    <div className="w-full h-56">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data}>
+          <XAxis dataKey="name" stroke="currentColor" />
+          <YAxis stroke="currentColor" />
+          <Tooltip />
+          <Bar dataKey="value">
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

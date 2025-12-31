@@ -1,76 +1,81 @@
+// frontend/src/pages/Login.jsx
 import { useState } from "react";
-import { login } from "../services/api";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE = "http://localhost:5000";
 
 export default function Login() {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-        const res = await login(email, password);
-        if (res.error) {
-            setError(res.error);
-            return;
-        }
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-        localStorage.setItem("token", res.token);
-        navigate("/");
-    };
+      const data = await res.json().catch(() => null);
 
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-[#0d1117] px-6">
+      if (!res.ok) {
+        throw new Error(data?.message || "Login failed");
+      }
 
-            {/* Logo */}
-            <img src="/src/assets/logo.svg" className="w-16 mb-4" />
+      // ✅ Standardize token storage
+      const token = data?.token;
+      if (!token) throw new Error("Login succeeded but no token returned.");
 
-            <h1 className="text-3xl font-bold mb-6 text-blue-500">Finance Track</h1>
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("token", token); // keep both for compatibility
+      if (data?.user) localStorage.setItem("user", JSON.stringify(data.user));
 
-            <div className="bg-white dark:bg-[#1a1f29] p-6 rounded-xl shadow-lg w-full max-w-md">
+      navigate("/dashboard");
+    } catch (e) {
+      setError(e.message || "Login error");
+    }
+  };
 
-                <h2 className="text-xl font-semibold mb-4 text-center dark:text-white">
-                    Login
-                </h2>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-
-                    <input
-                        type="email"
-                        className="w-full p-2 rounded-lg bg-gray-100 dark:bg-[#0d1117] 
-                                   border border-gray-300 dark:border-gray-700 
-                                   text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-
-                    <input
-                        type="password"
-                        className="w-full p-2 rounded-lg bg-gray-100 dark:bg-[#0d1117] 
-                                   border border-gray-300 dark:border-gray-700 
-                                   text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
-                        Log In
-                    </button>
-                </form>
-
-                {error && <p className="text-red-500 text-center mt-2">{error}</p>}
-
-                <p className="text-center mt-4 text-sm dark:text-gray-300">
-                    Don't have an account?{" "}
-                    <Link to="/signup" className="text-blue-500">Sign Up</Link>
-                </p>
-
-            </div>
+  return (
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+        <div className="text-xl font-bold mb-1">Login</div>
+        <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+          Sign in to your Finance Tracker
         </div>
-    );
+
+        {error ? (
+          <div className="mb-4 rounded-lg border border-red-300 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200 p-3">
+            {error}
+          </div>
+        ) : null}
+
+        <form onSubmit={handleLogin} className="space-y-3">
+          <input
+            className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button className="w-full px-4 py-2 rounded-md bg-blue-600 text-white hover:opacity-90">
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
