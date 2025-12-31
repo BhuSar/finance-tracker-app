@@ -14,43 +14,46 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// ✅ CORS (local dev + deployed frontend later)
+// ✅ CORS (LOCAL + PRODUCTION)
 const allowedOrigins = [
   "http://localhost:5173",
-  // Add your deployed frontend URL here later (Render Static Site / Vercel / Netlify)
-  // "https://your-frontend-domain.com",
+  "https://finance-tracker-app-1-lkji.onrender.com"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman) or allowed origins
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      // allow requests with no origin (Postman, server-to-server)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
 );
 
-// ✅ Render / root route (prevents "Cannot GET /")
+// ✅ Root route (prevents "Cannot GET /")
 app.get("/", (req, res) => {
   res.status(200).send("Finance Tracker API is running ✅");
 });
 
 // ✅ Health check
-app.get("/api/ping", (req, res) => res.json({ message: "pong" }));
+app.get("/api/ping", (req, res) => {
+  res.json({ message: "pong" });
+});
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/ai", aiRoutes);
 
-// ✅ Proof route (optional)
-app.get("/api/ai-test", (req, res) =>
-  res.json({ ok: true, msg: "ai routes mounted" })
-);
+// ✅ Proof route
+app.get("/api/ai-test", (req, res) => {
+  res.json({ ok: true, msg: "ai routes mounted" });
+});
 
-// ✅ IMPORTANT: Render provides PORT automatically
+// ✅ Render provides PORT automatically
 const PORT = process.env.PORT || 5000;
 
 async function start() {
