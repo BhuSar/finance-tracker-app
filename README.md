@@ -9,31 +9,26 @@ This project demonstrates real-world full-stack development with modern technolo
 ## 🚀 Live Features
 
 ### 🔐 Authentication
-
 - Secure user signup & login
 - JWT-based authentication
 - Protected routes for user data
 
 ### 💰 Transactions
-
 - Add income and expenses
 - Edit and delete transactions
 - Data scoped per user
 
 ### 📊 Financial Overview
-
 - Total income, expenses, and balance
 - Category breakdown (charts)
 - Income vs expense visualization
 
 ### 🤖 AI Insights
-
 - AI-generated spending analysis
 - Identifies trends and warnings
 - Personalized financial suggestions based on user data
 
 ### 💡 AI Savings Suggestions
-
 - Smart recommendations to improve savings
 - Generated dynamically from transaction history
 
@@ -42,21 +37,18 @@ This project demonstrates real-world full-stack development with modern technolo
 ## 🛠 Tech Stack
 
 ### Frontend
-
 - React
 - Vite
 - Tailwind CSS
 - Recharts (data visualization)
 
 ### Backend
-
 - Node.js
 - Express
 - MongoDB + Mongoose
 - JWT Authentication
 
 ### AI
-
 - OpenAI API (GPT model)
 - Prompt-driven financial analysis
 
@@ -77,7 +69,7 @@ This project demonstrates real-world full-stack development with modern technolo
 
 - Each user only sees their own data
 - AI responses are generated live based on stored transactions
-- Designed as a **portfolio-quality project**, not a tutorial app
+- Designed as a portfolio-quality project, not a tutorial app
 
 ---
 
