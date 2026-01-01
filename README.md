@@ -10,6 +10,11 @@ This project demonstrates real-world full-stack development with modern technolo
 
 ## 🚀 Live Features
 
+## 🔑 Demo Account (for reviewers)
+
+Email: demo@finance-tracker.app  
+Password: Demo123!
+
 ### 🔐 Authentication
 
 - Secure user signup & login
